@@ -1,14 +1,15 @@
 from planner import generate_research_plan
 from task_splitter import split_into_subtasks
 from prompts import SUBAGENT_PROMPT_TEMPLATE, COORDINATOR_PROMPT_TEMPLATE
-from smolagents import LiteLLMModel, ToolCallingAgent, MCPClient, tool
+from smolagents import LiteLLMModel, ToolCallingAgent, MCPClient, tool, InferenceClientModel
+import os
 
 FIRECRAWL_API_KEY = os.environ["FIRECRAWL_API_KEY"]
 MCP_URL = f"https://mcp.firecrawl.dev/{FIRECRAWL_API_KEY}/v2/mcp"
 
 # You can vary models here:
-COORDINATOR_MODEL_ID = "openai/gpt-5.1"       # or 4.1 / 4.1-mini, etc.
-SUBAGENT_MODEL_ID    = "openai/gpt-4.1-mini"  # smaller model per subtask if you want
+COORDINATOR_MODEL_ID = "MiniMaxAI/MiniMax-M1-80k"
+SUBAGENT_MODEL_ID    = "MiniMaxAI/MiniMax-M1-80k"
 
 def run_deep_research(user_query: str) -> str:
     print("Running the deep research...")
@@ -24,8 +25,18 @@ def run_deep_research(user_query: str) -> str:
     print("Coordinator Model: ", COORDINATOR_MODEL_ID)
     print("Subagent Model: ", SUBAGENT_MODEL_ID)
 
-    coordinator_model = LiteLLMModel(model_id=COORDINATOR_MODEL_ID)
-    subagent_model    = LiteLLMModel(model_id=SUBAGENT_MODEL_ID)
+    coordinator_model = InferenceClientModel(
+        model_id=COORDINATOR_MODEL_ID, 
+        api_key=os.environ["HF_TOKEN"],
+        provider="novita",
+        bill_to="huggingface"
+        )
+    subagent_model = InferenceClientModel(
+        model_id=SUBAGENT_MODEL_ID, 
+        api_key=os.environ["HF_TOKEN"],
+        provider="novita",
+        bill_to="huggingface"
+        )
 
     with MCPClient({"url": MCP_URL, "transport": "streamable-http"}) as mcp_tools:
 

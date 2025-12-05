@@ -471,11 +471,15 @@ name = "firecrawl-smolagents-deep-research"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "python-dotenv" },
     { name = "smolagents", extra = ["litellm", "mcp", "openai"] },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "smolagents", extras = ["litellm", "mcp", "openai"], specifier = ">=1.23.0" }]
+requires-dist = [
+    { name = "python-dotenv", specifier = ">=1.2.1" },
+    { name = "smolagents", extras = ["litellm", "mcp", "openai"], specifier = ">=1.23.0" },
+]
 
 [[package]]
 name = "frozenlist"

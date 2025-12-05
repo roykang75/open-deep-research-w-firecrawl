@@ -1,5 +1,14 @@
+from coordinator import run_deep_research
+from dotenv import load_dotenv
+
 def main():
-    print("Hello from firecrawl-smolagents-deep-research!")
+    load_dotenv()
+    user_query = input("Enter your research query: ")
+    result = run_deep_research(user_query)
+    with open("research_result.md", "w") as f:
+        f.write(result)
+
+    print("Research result saved to research_result.md")
 
 
 if __name__ == "__main__":
