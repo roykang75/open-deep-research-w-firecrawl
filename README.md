@@ -17,6 +17,8 @@ The workflow mirrors the diagram you attached: generate plan → split into task
 - Sub‑agents: created inside `coordinator.py:46`, each runs a targeted prompt and returns a markdown report.
 - Synthesis: the coordinator gathers all sub‑agent outputs and creates the final report.
 
+![Open Deep Research Workflow Diagram](docs/open-deep-research-workflow-diagram.png)
+
 ## Models & Providers
 - Models are configured in code and executed via Hugging Face Inference Providers.
 - Defaults demonstrate open‑model usage (e.g., `deepseek-ai/*`) and can be changed by editing the `MODEL_ID` constants:
