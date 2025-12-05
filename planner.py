@@ -1,11 +1,5 @@
 import os
-import json
-from typing import List, Dict, Any
-from typing import List
-from pydantic import BaseModel, Field
-
 from huggingface_hub import InferenceClient
-from smolagents import LiteLLMModel, ToolCallingAgent, MCPClient, tool
 from prompts import PLANNER_SYSTEM_INSTRUCTIONS
 
 def generate_research_plan(user_query: str) -> str:
@@ -27,9 +21,31 @@ def generate_research_plan(user_query: str) -> str:
             {"role": "system", "content": PLANNER_SYSTEM_INSTRUCTIONS},
             {"role": "user", "content": user_query},
         ],
+        stream=True,
     )
 
-    research_plan = completion.choices[0].message.content
-    print("\033[93mGenerated Research Plan\033[0m")
-    print(f"\033[93m{research_plan}\033[0m")
+    print("\033[93mGenerated Research Plan:\033[0m")
+    research_plan = ""
+
+    def _content(obj):
+        try:
+            return obj.choices[0].delta.content
+        except Exception:
+            try:
+                return obj.choices[0].message.content
+            except Exception:
+                return None
+
+    try:
+        for chunk in completion:
+            c = _content(chunk)
+            if c:
+                research_plan += c
+                print(c, end="")
+    except TypeError:
+        c = _content(completion)
+        if c:
+            research_plan = c
+            print(c, end="")
+
     return research_plan

@@ -1,3 +1,4 @@
+import os
 import json
 from typing import List
 from pydantic import BaseModel, Field
@@ -41,11 +42,11 @@ def split_into_subtasks(research_plan: str) -> List[Subtask]:
     print("PROVIDER: ", PROVIDER)
     
     client = InferenceClient(
-      api_key=os.environ["HF_TOKEN"],
-      bill_to="huggingface",
-      provider=PROVIDER,
+        api_key=os.environ["HF_TOKEN"],
+        bill_to="huggingface",
+        provider=PROVIDER,
     )
-    completion = client.chat_completion(
+    completion = client.chat.completions.create(
         model=MODEL_ID,
         messages=[
             {"role": "system", "content": TASK_SPLITTER_SYSTEM_INSTRUCTIONS},
@@ -54,7 +55,7 @@ def split_into_subtasks(research_plan: str) -> List[Subtask]:
         response_format={
             "type": "json_schema",
             "json_schema": TASK_SPLITTER_JSON_SCHEMA,
-        },
+        }
     )
 
     message = completion.choices[0].message

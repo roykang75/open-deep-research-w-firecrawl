@@ -3,6 +3,7 @@ from task_splitter import split_into_subtasks
 from prompts import SUBAGENT_PROMPT_TEMPLATE, COORDINATOR_PROMPT_TEMPLATE
 from smolagents import LiteLLMModel, ToolCallingAgent, MCPClient, tool, InferenceClientModel
 import os
+import json
 
 FIRECRAWL_API_KEY = os.environ["FIRECRAWL_API_KEY"]
 MCP_URL = f"https://mcp.firecrawl.dev/{FIRECRAWL_API_KEY}/v2/mcp"
