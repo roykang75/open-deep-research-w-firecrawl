@@ -4,6 +4,10 @@ Deep‑research system that takes a user query, plans the work, splits it into f
 
 The workflow mirrors the diagram you attached: generate plan → split into tasks → coordinator spawns sub‑agents → sub‑agents research → coordinator aggregates → final result.
 
+## Links
+- [YouTube video tutorial](https://www.youtube.com/watch?v=vHBRmXpDIFY)
+- [Written version of the tutorial](https://alejandro-ao.com/posts/agents/multi-agent-deep-research/)
+
 ## Highlights
 - Built on `smolagents` (by Hugging Face) for agent orchestration and tool calling.
 - All LLM calls run via Hugging Face Inference Providers using open models.
