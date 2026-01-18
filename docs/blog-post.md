@@ -35,7 +35,7 @@ def generate_research_plan(user_query: str) -> str:
 
     planner_client = InferenceClient(
         api_key=os.environ["HF_TOKEN"],
-        bill_to="huggingface",
+        #bill_to="huggingface",
         provider=PROVIDER,
     )
 

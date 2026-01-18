@@ -30,13 +30,13 @@ def run_deep_research(user_query: str) -> str:
         model_id=COORDINATOR_MODEL_ID, 
         api_key=os.environ["HF_TOKEN"],
         provider="novita",
-        bill_to="huggingface"
+        #bill_to="huggingface"
         )
     subagent_model = InferenceClientModel(
         model_id=SUBAGENT_MODEL_ID, 
         api_key=os.environ["HF_TOKEN"],
         provider="novita",
-        bill_to="huggingface"
+        #bill_to="huggingface"
         )
 
     with MCPClient({"url": MCP_URL, "transport": "streamable-http"}) as mcp_tools:

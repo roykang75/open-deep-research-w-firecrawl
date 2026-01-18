@@ -32,7 +32,7 @@ TASK_SPLITTER_JSON_SCHEMA = {
     "strict": True,
 }
 
-def split_into_subtasks(research_plan: str) -> List[Subtask]:
+def split_into_subtasks(research_plan: str) -> List[dict]:
 
     MODEL_ID = "deepseek-ai/DeepSeek-V3.2-Exp"
     PROVIDER = "novita"
@@ -43,24 +43,46 @@ def split_into_subtasks(research_plan: str) -> List[Subtask]:
     
     client = InferenceClient(
         api_key=os.environ["HF_TOKEN"],
-        bill_to="huggingface",
+        #bill_to="huggingface",
         provider=PROVIDER,
     )
-    completion = client.chat.completions.create(
-        model=MODEL_ID,
-        messages=[
-            {"role": "system", "content": TASK_SPLITTER_SYSTEM_INSTRUCTIONS},
-            {"role": "user", "content": research_plan},
-        ],
-        response_format={
-            "type": "json_schema",
-            "json_schema": TASK_SPLITTER_JSON_SCHEMA,
-        }
-    )
+    try:
+        completion = client.chat.completions.create(
+            model=MODEL_ID,
+            messages=[
+                {"role": "system", "content": TASK_SPLITTER_SYSTEM_INSTRUCTIONS},
+                {"role": "user", "content": research_plan},
+            ],
+            response_format={
+                "type": "json_schema",
+                "json_schema": TASK_SPLITTER_JSON_SCHEMA,
+            }
+        )
+        content = completion.choices[0].message.content
+        if not content:
+            raise ValueError("LLM returned empty content")
+            
+        # Parse and validate using Pydantic
+        subtask_list = SubtaskList.model_validate_json(content)
+        subtasks = [t.model_dump() for t in subtask_list.subtasks]
 
-    message = completion.choices[0].message
-
-    subtasks = json.loads(message.content)['subtasks']
+    except Exception as e:
+        print(f"\033[91mError during subtask generation: {e}\033[0m")
+        if 'content' in locals() and content:
+            print(f"Raw content: {content}")
+        # Fallback: try manual extraction if JSON schema fails but content exists
+        try:
+            if 'content' in locals() and content:
+                data = json.loads(content)
+                if 'subtasks' in data:
+                    subtasks = data['subtasks']
+                else:
+                    raise ValueError("No 'subtasks' key in JSON")
+            else:
+                raise e
+        except Exception as fallback_e:
+            print(f"\033[91mFallback also failed: {fallback_e}\033[0m")
+            raise e
 
     print("\033[93mGenerated The Following Subtasks\033[0m")
     for task in subtasks:
