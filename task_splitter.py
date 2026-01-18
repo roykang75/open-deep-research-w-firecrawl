@@ -3,7 +3,7 @@ import json
 from typing import List
 from pydantic import BaseModel, Field
 
-from huggingface_hub import InferenceClient
+from openai import OpenAI
 from prompts import TASK_SPLITTER_SYSTEM_INSTRUCTIONS
 
 class Subtask(BaseModel):
@@ -34,21 +34,21 @@ TASK_SPLITTER_JSON_SCHEMA = {
 
 def split_into_subtasks(research_plan: str) -> List[dict]:
 
-    MODEL_ID = "deepseek-ai/DeepSeek-V3.2-Exp"
-    PROVIDER = "novita"
+    TASK_LLM_URL = os.environ.get("TASK_LLM_URL", "https://api.openai.com/v1")
+    TASK_MODEL = os.environ.get("TASK_MODEL", "gpt-4o")
     
-    print("Splitting the research plan into subtasks...")
-    print("MODEL: ", MODEL_ID)
-    print("PROVIDER: ", PROVIDER)
+    print("\nSplitting the research plan into subtasks...")
+    print("MODEL: ", TASK_MODEL)
+    print("LLM_URL: ", TASK_LLM_URL)
     
-    client = InferenceClient(
-        api_key=os.environ["HF_TOKEN"],
-        #bill_to="huggingface",
-        provider=PROVIDER,
+    client = OpenAI(
+        api_key=os.environ.get("OPENAI_API_KEY"),
+        base_url=TASK_LLM_URL,
     )
+    
     try:
         completion = client.chat.completions.create(
-            model=MODEL_ID,
+            model=TASK_MODEL,
             messages=[
                 {"role": "system", "content": TASK_SPLITTER_SYSTEM_INSTRUCTIONS},
                 {"role": "user", "content": research_plan},

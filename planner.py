@@ -1,22 +1,21 @@
 import os
-from huggingface_hub import InferenceClient
+from openai import OpenAI
 from prompts import PLANNER_SYSTEM_INSTRUCTIONS
 
 def generate_research_plan(user_query: str) -> str:
-    MODEL_ID = "moonshotai/Kimi-K2-Thinking"
-    PROVIDER = "novita"
+    PLANNER_LLM_URL = os.environ.get("PLANNER_LLM_URL", "https://api.openai.com/v1")
+    PLANNER_MODEL = os.environ.get("PLANNER_MODEL", "gpt-4o")
 
     print("Generating the research plan for the query: ", user_query)
-    print("MODEL: ", MODEL_ID)
-    print("PROVIDER: ", PROVIDER)
+    print("MODEL: ", PLANNER_MODEL)
+    print("LLM_URL: ", PLANNER_LLM_URL)
 
-    planner_client = InferenceClient(
-        api_key=os.environ["HF_TOKEN"],
-        #bill_to="huggingface",
-        provider=PROVIDER,
+    planner_client = OpenAI(
+        api_key=os.environ.get("OPENAI_API_KEY"),
+        base_url=PLANNER_LLM_URL,
     )
     completion = planner_client.chat.completions.create(
-        model=MODEL_ID,
+        model=PLANNER_MODEL,
         messages=[
             {"role": "system", "content": PLANNER_SYSTEM_INSTRUCTIONS},
             {"role": "user", "content": user_query},
